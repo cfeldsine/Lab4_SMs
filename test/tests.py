@@ -14,46 +14,64 @@
 # An example set of tests is shown below. It is important to note that these tests are not "unit tests" in 
 # that they are not ran in isolation but in the order shown and the state of the device is not reset or 
 # altered in between executions (unless preconditions are used).
-tests = [ {'description': 'PINA: 0x00 => PORTB: 1, state: Wait1',
+tests = [ {'description': 'PINA: 0x00 => PORTC: 7, state: wait',
     'steps': [ {'inputs': [('PINA',0x00)], 'iterations': 2 } ],
-    'expected': [('PORTB',0x01)],
+    'expected': [('PORTC',0x07)],
     },
 
-     {'description': 'PINA: 0x00, 0x01 => PORTB: 2, state: Press2.',
-     'steps': [ {'inputs': [('PINA',0x00 )],'iterations': 2},
-     {'inputs': [('PINA',0x01 )],'iterations': 2}],
-     'expected': [('PORTB',0x02)],
-     },
+    {'description': 'Upper Bound check => PORTC: 9, state: press1',
+    'steps': [ {'inputs': [('PINA',0x01)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 }, 
+    {'inputs': [('PINA',0x01)], 'iterations': 2 }, 
+    {'inputs': [('PINA',0x00)], 'iterations': 2 }, 
+    {'inputs': [('PINA',0x01)], 'iterations': 2 }, ],
+    'expected': [('PORTC',0x09)],
+    },
 
-     {'description': 'PINA: 0x00, 0x01, 0x00 => PORTB: 2, state: Wait2.',
-     'steps': [ {'inputs': [('PINA',0x00 )],'iterations': 2},
-     {'inputs': [('PINA',0x01 )],'iterations': 2},
-     {'inputs': [('PINA',0x00)], 'iterations': 2 } ],
-     'expected': [('PORTB',0x02)],
-     },
+    {'description': 'Lower Bound check => PORTC: 0, state: press2',
+    'steps': [ {'inputs': [('PINA',0x02)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x02)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x02)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x02)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x02)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x02)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x02)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x02)], 'iterations': 2 } ],
+    'expected': [('PORTC',0x00)],
+    },
 
-     {'description': 'PINA: 0x00, 0x01, 0x00, 0x01 => PORTB: 1, state: Press1.',
-     'steps': [ {'inputs': [('PINA',0x00 )],'iterations': 2},
-     {'inputs': [('PINA',0x01 )],'iterations': 2},
-     {'inputs': [('PINA',0x00 )],'iterations': 2},
-     {'inputs': [('PINA',0x01 )],'iterations': 2}],
-     'expected': [('PORTB',0x01)],
-     },   
+    {'description': 'Reset check => PORTC: 0, state: reset',
+    'steps': [ {'inputs': [('PINA',0x01)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x02)], 'iterations': 2 },
+    {'inputs': [('PINA',0x03)], 'iterations': 2 } ],
+    'expected': [('PORTC',0x00)],
+    },
 
-     {'description': 'PINA: 0x00, 0x01, 0x00, 0x01, 0x00 => PORTB: 1, state: Wait1.',
-     'steps': [ {'inputs': [('PINA',0x00 )],'iterations': 2},
-     {'inputs': [('PINA',0x01 )],'iterations': 2},
-     {'inputs': [('PINA',0x00 )],'iterations': 2},
-     {'inputs': [('PINA',0x01 )],'iterations': 2},
-     {'inputs': [('PINA',0x00 )],'iterations': 2}],
-     'expected': [('PORTB',0x01)],
-     },    
-
-
+    {'description': 'Add/Subtract test => PORTC: 6, state: press1',
+    'steps': [ {'inputs': [('PINA',0x02)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x02)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x01)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x02)], 'iterations': 2 },
+    {'inputs': [('PINA',0x00)], 'iterations': 2 },
+    {'inputs': [('PINA',0x01)], 'iterations': 2 } ],
+    'expected': [('PORTC',0x06)],
+    },
 ]
 
 # Optionally you can add a set of "watch" variables these need to be global or static and may need
 # to be scoped at the function level (for static variables) if there are naming conflicts. The 
 # variables listed here will display everytime you hit (and stop at) a breakpoint
-watch = ['SM1_STATE']
+watch = ['state', 'tmpC']
+
 

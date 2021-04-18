@@ -12,65 +12,123 @@
 #include "simAVRHeader.h"
 #endif
 
-int main(void) {
-    /* Insert DDR and PORT initializations */
-    DDRA = 0x00; PORTA = 0xFF;
-    DDRB = 0xFF; PORTB = 0x01;
-
-    unsigned char tmpB = 0x01;
-    unsigned char tmpA;
+enum states {init, press1, press2, wait1, wait2, wait, reset} state;
     
-    enum SM1_STATES {SM1_Wait1, SM1_Press2,  SM1_Wait2, SM1_Press1} SM1_STATE;
-    
-    SM1_STATE = SM1_Wait1;
-    
-    /* Insert your solution below */
-    while (1) {
+void TickFct(short *tmpC, unsigned char tmpA){
 	tmpA = PINA;
-	switch(SM1_STATE){
-	    case SM1_Wait1:
-		if (tmpA == 0x01){
-		    SM1_STATE = SM1_Press2;
+	switch(state){
+	    case init:
+		if (!tmpA){
+		    state = wait;
+		} else if (tmpA == 0x01) {
+		    state = press1;
+		} else if (tmpA == 0x02) {
+		    state = press2;
+		} else {
+		    state = reset;
 		}
 		break;
-	    case SM1_Press2:
-		if (tmpA == 0x00){
-		    SM1_STATE = SM1_Wait2;
-		}
+	    case press1:
+                if (!tmpA){ 
+                    state = wait; 
+                } else if (tmpA == 0x01) {
+                    state = wait1;
+                } else if (tmpA == 0x02) {
+                    state = press2;
+                } else {
+                    state = reset;
+                }
 		break;
-	    case SM1_Wait2:
-		if (tmpA == 0x01){
-		    SM1_STATE = SM1_Press1;
+	    case wait1:
+		if (!tmpA){
+		    state = wait;
+		} else if (tmpA == 0x01){
+		    state = wait1;
+		} else if (tmpA == 0x02){
+		    state = press2;
+		} else {
+		    state = reset;
 		}
+	    case press2:
+                if (!tmpA){ 
+                    state = wait; 
+                } else if (tmpA == 0x01) {
+                    state = press1;
+                } else if (tmpA == 0x02) {
+                    state = wait2;
+                } else {
+                    state = reset;
+                }
 		break;
-	    case SM1_Press1:
-		if (tmpA == 0x00){
-		    SM1_STATE = SM1_Wait1;
-		}
-		break;
+            case wait2:
+                if (!tmpA){
+                    state = wait;
+                } else if (tmpA == 0x01){
+                    state = press1;
+                } else if (tmpA == 0x02){
+                    state = wait2;
+                } else {
+                    state = reset;
+                }
+            case wait:
+                if (!tmpA){ 
+                    state = wait; 
+                } else if (tmpA == 0x01) {
+                    state = press1;
+                } else if (tmpA == 0x02) {
+                    state = press2;
+                } else {
+                    state = reset;
+                }
+                break;
+            case reset:
+                if (!tmpA){ 
+                    state = wait; 
+                } else if (tmpA == 0x01) {
+                    state = press1;
+                } else if (tmpA == 0x02) {
+                    state = press2;
+                } else {
+                    state = reset;
+                }
+                break;
 	    default:
-		SM1_STATE = SM1_Wait1;
+		state = reset;
 		break;
 	}
 	
-	switch(SM1_STATE){
-	    case SM1_Wait1:
-		tmpB = 0x01;
+	switch(state){
+	    case init:
+		*tmpC = 0x07;
 		break;
-	    case SM1_Press2:
-		tmpB = 0x02;
+	    case press1:
+		if (*tmpC < 9){
+		    *tmpC += 1;
+		}
 		break;
-	    case SM1_Wait2:
-		tmpB = 0x02;
+	    case press2:
+		if (*tmpC > 0){
+		    *tmpC -= 1;
+		}
 		break;
-	    case SM1_Press1:
-		tmpB = 0x01;
+	    case reset:
+		*tmpC = 0x00;
 		break;
 	    default:
-		tmpB = 0x00;
 		break;
 	}
-	PORTB = tmpB;
+}
+
+int main(void) {
+    DDRA = 0x00; PORTA = 0xFF;
+    DDRC = 0xFF; PORTC = 0x00;
+    
+    unsigned char tmpA = 0x00;
+    short tmpC = 0x07;
+    state = init;
+    while (1) {
+	TickFct(&tmpC, tmpA);
+	PORTC = tmpC;
     }
     return 1;
 }
