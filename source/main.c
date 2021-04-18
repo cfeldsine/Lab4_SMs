@@ -44,9 +44,7 @@ void TickFct(short *tmpC, unsigned char tmpA){
 		    state = wait;
 		} else if (tmpA == 0x01){
 		    state = wait1;
-		} else if (tmpA == 0x02){
-		    state = press2;
-		} else {
+		} else if (tmpA == 0x03) {
 		    state = reset;
 		}
 	    case press2:
@@ -63,11 +61,9 @@ void TickFct(short *tmpC, unsigned char tmpA){
             case wait2:
                 if (!tmpA){
                     state = wait;
-                } else if (tmpA == 0x01){
-                    state = press1;
                 } else if (tmpA == 0x02){
                     state = wait2;
-                } else {
+                } else if (tmpA == 0x03) {
                     state = reset;
                 }
             case wait:
